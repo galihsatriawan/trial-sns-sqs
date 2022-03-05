@@ -15,6 +15,7 @@ type SNS struct {
 }
 type SNSClient interface {
 	ListTopics(ctx context.Context) (topics []*sns.Topic, err error)
+	ListSubscriptions(ctx context.Context) (subscriptions []*sns.Subscription, err error)
 }
 
 func (s *SNS) ListTopics(ctx context.Context) (topics []*sns.Topic, err error) {
@@ -25,6 +26,16 @@ func (s *SNS) ListTopics(ctx context.Context) (topics []*sns.Topic, err error) {
 		return topics, err
 	}
 	return res.Topics, nil
+}
+
+func (s *SNS) ListSubscriptions(ctx context.Context) (subscriptions []*sns.Subscription, err error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
+	defer cancel()
+	res, err := s.client.ListSubscriptionsWithContext(ctx, nil)
+	if err != nil {
+		return
+	}
+	return res.Subscriptions, nil
 }
 func NewSNS(config utils.Config) SNSClient {
 	sess, err := newSNSConfig(config)

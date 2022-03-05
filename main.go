@@ -23,7 +23,7 @@ func init() {
 }
 func main() {
 	ctx := context.Background()
-	res, err := snsClient.ListTopics(ctx)
+	res, err := snsClient.ListSubscriptions(ctx)
 	if err != nil {
 		panic(err)
 	}
