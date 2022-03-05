@@ -14,10 +14,22 @@ type SNS struct {
 	client  *sns.SNS
 }
 type SNSClient interface {
+	CreateTopic(ctx context.Context, topic string) (topicArn string, err error)
 	ListTopics(ctx context.Context) (topics []*sns.Topic, err error)
 	ListSubscriptions(ctx context.Context) (subscriptions []*sns.Subscription, err error)
 }
 
+func (s *SNS) CreateTopic(ctx context.Context, topic string) (topicArn string, err error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
+	defer cancel()
+	res, err := s.client.CreateTopicWithContext(ctx, &sns.CreateTopicInput{
+		Name: &topic,
+	})
+	if err != nil {
+		return
+	}
+	return *res.TopicArn, nil
+}
 func (s *SNS) ListTopics(ctx context.Context) (topics []*sns.Topic, err error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
 	defer cancel()

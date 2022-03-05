@@ -23,9 +23,15 @@ func init() {
 }
 func main() {
 	ctx := context.Background()
-	res, err := snsClient.ListSubscriptions(ctx)
+	resCreateTopic, err := snsClient.CreateTopic(ctx, "my-second-topic")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(res)
+	fmt.Println(resCreateTopic)
+
+	resTopics, err := snsClient.ListTopics(ctx)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(resTopics)
 }
