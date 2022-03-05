@@ -4,9 +4,13 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	AWS struct {
-		ACCESS_KEY string `mapstructure:"AWS_ACCESS_KEY"`
-		SECRET_KEY string `mapstructure:"AWS_SECRET_KEY"`
-		REGION     string `mapstructure:"AWS_REGION"`
+		SNS struct {
+			ACCESS_KEY  string `mapstructure:"ACCESS_KEY"`
+			SECRET_KEY  string `mapstructure:"SECRET_KEY"`
+			REGION      string `mapstructure:"REGION"`
+			MAX_RETRIES int    `mapstructure:"MAX_RETRIES"`
+			TIMEOUT     int    `mapstructure:"TIMEOUT"`
+		}
 	}
 }
 

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/galihsatriawan/trial-queue/utils"
+	awsInternal "github.com/galihsatriawan/trial-sns-sqs/internal/pkg/aws"
+	"github.com/galihsatriawan/trial-sns-sqs/utils"
 )
 
 var config utils.Config
+var snsClient awsInternal.SNSClient
 
 func init() {
 	var err error
@@ -15,8 +18,14 @@ func init() {
 		panic(err)
 	}
 
+	snsClient = awsInternal.NewSNS(config)
+
 }
 func main() {
-
-	fmt.Println(config)
+	ctx := context.Background()
+	res, err := snsClient.ListTopics(ctx)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(res)
 }
