@@ -23,11 +23,6 @@ func init() {
 }
 func main() {
 	ctx := context.Background()
-	resCreateTopic, err := snsClient.CreateTopic(ctx, "my-second-topic")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(resCreateTopic)
 
 	resTopics, err := snsClient.ListTopics(ctx)
 	if err != nil {
@@ -35,7 +30,16 @@ func main() {
 	}
 	fmt.Println(resTopics)
 	// try first topic
-	subscriptions, err := snsClient.ListSubsciptionsByTopic(ctx, *resTopics[0].TopicArn)
+	topicArn := *resTopics[0].TopicArn
+	endpoint := "+62"
+	protocol := awsInternal.ProtocolSMS
+	subscription, err := snsClient.Subscribe(ctx, topicArn, endpoint, protocol)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(subscription)
+
+	subscriptions, err := snsClient.ListSubsciptionsByTopic(ctx, topicArn)
 	if err != nil {
 		panic(err)
 	}

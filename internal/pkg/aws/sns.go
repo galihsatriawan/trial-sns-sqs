@@ -2,12 +2,20 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/galihsatriawan/trial-sns-sqs/utils"
+)
+
+type Protocol string
+
+var (
+	ProtocolSMS   Protocol = "sms"
+	ProtocolEmail Protocol = "email"
 )
 
 type SNS struct {
@@ -19,6 +27,7 @@ type SNSClient interface {
 	ListTopics(ctx context.Context) (topics []*sns.Topic, err error)
 	ListSubscriptions(ctx context.Context) (subscriptions []*sns.Subscription, err error)
 	ListSubsciptionsByTopic(ctx context.Context, topic string) (subscriptions []*sns.Subscription, err error)
+	Subscribe(ctx context.Context, topic string, endpoint string, protocol Protocol) (subscription string, err error)
 }
 
 func (s *SNS) CreateTopic(ctx context.Context, topic string) (topicArn string, err error) {
@@ -31,6 +40,23 @@ func (s *SNS) CreateTopic(ctx context.Context, topic string) (topicArn string, e
 		return
 	}
 	return *res.TopicArn, nil
+}
+func (s *SNS) Subscribe(ctx context.Context, topic string, endpoint string, protocol Protocol) (subscription string, err error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
+	defer cancel()
+	res, err := s.client.SubscribeWithContext(ctx, &sns.SubscribeInput{
+		Endpoint: aws.String(endpoint),
+		Protocol: aws.String(string(protocol)),
+		TopicArn: aws.String(topic),
+	})
+	if err != nil {
+		return
+	}
+	if res.SubscriptionArn == nil {
+		err = fmt.Errorf("EP is not confirmed yet : %v", err.Error())
+		return
+	}
+	return *res.SubscriptionArn, nil
 }
 func (s *SNS) ListTopics(ctx context.Context) (topics []*sns.Topic, err error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
