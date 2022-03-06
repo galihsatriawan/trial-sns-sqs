@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/galihsatriawan/trial-sns-sqs/utils"
 )
@@ -112,15 +111,4 @@ func NewSNS(config utils.Config) SNSClient {
 		client:  client,
 		timeout: config.AWS.SNS.TIMEOUT,
 	}
-}
-
-func (sc *SNSConfig) Retrieve() (credentials.Value, error) {
-	cred := credentials.Value{
-		AccessKeyID:     sc.config.AWS.SNS.ACCESS_KEY,
-		SecretAccessKey: sc.config.AWS.SNS.SECRET_KEY,
-	}
-	return cred, nil
-}
-func (sc *SNSConfig) IsExpired() bool {
-	return false
 }

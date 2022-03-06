@@ -10,6 +10,7 @@ import (
 
 var config utils.Config
 var snsClient awsInternal.SNSClient
+var sqsClient awsInternal.SQSClient
 
 func init() {
 	var err error
@@ -19,23 +20,29 @@ func init() {
 	}
 
 	snsClient = awsInternal.NewSNS(config)
-
+	sqsClient = awsInternal.NewSQS(config)
 }
 func main() {
 	ctx := context.Background()
-
-	resTopics, err := snsClient.ListTopics(ctx)
+	urls, err := sqsClient.ListQueues(ctx)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(resTopics)
-	// try first topic
-	topicArn := *resTopics[0].TopicArn
-	messageID, err := snsClient.Publish(ctx, topicArn, "This is my test message")
-	if err != nil {
-		panic(err)
+	for _, v := range urls {
+		fmt.Println(*v)
 	}
-	fmt.Println(messageID)
+	// resTopics, err := snsClient.ListTopics(ctx)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(resTopics)
+	// // try first topic
+	// topicArn := *resTopics[0].TopicArn
+	// messageID, err := snsClient.Publish(ctx, topicArn, "This is my test message")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(messageID)
 	// endpoint := "+62"
 	// protocol := awsInternal.ProtocolSMS
 	// subscription, err := snsClient.Subscribe(ctx, topicArn, endpoint, protocol)

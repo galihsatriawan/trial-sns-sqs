@@ -11,12 +11,19 @@ type Config struct {
 			MAX_RETRIES int    `mapstructure:"MAX_RETRIES"`
 			TIMEOUT     int    `mapstructure:"TIMEOUT"`
 		}
+		SQS struct {
+			ACCESS_KEY  string `mapstructure:"ACCESS_KEY"`
+			SECRET_KEY  string `mapstructure:"SECRET_KEY"`
+			REGION      string `mapstructure:"REGION"`
+			MAX_RETRIES int    `mapstructure:"MAX_RETRIES"`
+			TIMEOUT     int    `mapstructure:"TIMEOUT"`
+		}
 	}
 }
 
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigFile(".env")
+	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
