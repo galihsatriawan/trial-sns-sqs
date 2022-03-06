@@ -34,4 +34,10 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(resTopics)
+	// try first topic
+	subscriptions, err := snsClient.ListSubsciptionsByTopic(ctx, *resTopics[0].TopicArn)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(subscriptions)
 }
