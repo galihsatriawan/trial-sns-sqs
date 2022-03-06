@@ -31,17 +31,22 @@ func main() {
 	fmt.Println(resTopics)
 	// try first topic
 	topicArn := *resTopics[0].TopicArn
-	endpoint := "+62"
-	protocol := awsInternal.ProtocolSMS
-	subscription, err := snsClient.Subscribe(ctx, topicArn, endpoint, protocol)
+	messageID, err := snsClient.Publish(ctx, topicArn, "This is my test message")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(subscription)
+	fmt.Println(messageID)
+	// endpoint := "+62"
+	// protocol := awsInternal.ProtocolSMS
+	// subscription, err := snsClient.Subscribe(ctx, topicArn, endpoint, protocol)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(subscription)
 
-	subscriptions, err := snsClient.ListSubsciptionsByTopic(ctx, topicArn)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(subscriptions)
+	// subscriptions, err := snsClient.ListSubsciptionsByTopic(ctx, topicArn)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(subscriptions)
 }

@@ -28,6 +28,7 @@ type SNSClient interface {
 	ListSubscriptions(ctx context.Context) (subscriptions []*sns.Subscription, err error)
 	ListSubsciptionsByTopic(ctx context.Context, topic string) (subscriptions []*sns.Subscription, err error)
 	Subscribe(ctx context.Context, topic string, endpoint string, protocol Protocol) (subscription string, err error)
+	Publish(ctx context.Context, topic string, message string) (messageID string, err error)
 }
 
 func (s *SNS) CreateTopic(ctx context.Context, topic string) (topicArn string, err error) {
@@ -57,6 +58,18 @@ func (s *SNS) Subscribe(ctx context.Context, topic string, endpoint string, prot
 		return
 	}
 	return *res.SubscriptionArn, nil
+}
+func (s *SNS) Publish(ctx context.Context, topic string, message string) (messageID string, err error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
+	defer cancel()
+	res, err := s.client.PublishWithContext(ctx, &sns.PublishInput{
+		Message:  aws.String(message),
+		TopicArn: aws.String(topic),
+	})
+	if err != nil {
+		return
+	}
+	return *res.MessageId, nil
 }
 func (s *SNS) ListTopics(ctx context.Context) (topics []*sns.Topic, err error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(s.timeout*int(time.Second)))
