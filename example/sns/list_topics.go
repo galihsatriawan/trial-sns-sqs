@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"runtime"
 
 	awsInternal "github.com/galihsatriawan/trial-sns-sqs/internal/pkg/aws"
 	"github.com/galihsatriawan/trial-sns-sqs/utils"
@@ -10,25 +12,26 @@ import (
 
 var config utils.Config
 var snsClient awsInternal.SNSClient
-var sqsClient awsInternal.SQSClient
 
 func init() {
 	var err error
-	config, err = utils.LoadConfig(".")
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	configPath := filepath.Join(basepath, "../../")
+
+	config, err = utils.LoadConfig(configPath)
 	if err != nil {
 		panic(err)
 	}
 
 	snsClient = awsInternal.NewSNS(config)
-	sqsClient = awsInternal.NewSQS(config)
 }
 func main() {
 	ctx := context.Background()
-	urls, err := sqsClient.ListQueues(ctx)
+
+	resTopics, err := snsClient.ListTopics(ctx)
 	if err != nil {
 		panic(err)
 	}
-	for _, v := range urls {
-		fmt.Println(*v)
-	}
+	fmt.Println(resTopics)
 }
