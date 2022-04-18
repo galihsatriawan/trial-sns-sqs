@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"runtime"
@@ -12,11 +11,10 @@ import (
 )
 
 var config utils.Config
-
 var sqsClient awsInternal.SQSClient
 
 const (
-	exampleQueueName = "my-second-queue"
+	exampleQueueName = "my-first-queue"
 )
 
 func init() {
@@ -33,16 +31,14 @@ func init() {
 }
 func main() {
 	ctx := context.Background()
-	messages, err := sqsClient.ReceiveMessages(ctx, exampleQueueName, nil)
-	if err != nil {
-		panic(err)
-	}
-	for _, v := range messages {
-		str, _ := json.Marshal(v)
-		fmt.Println(string(str))
-		queueUrl, _ := sqsClient.GetURLQueue(ctx, exampleQueueName)
-		sqsClient.ChangeVisibilityTimeout(ctx, queueUrl, v, 1)
-		// fmt.Println("Message I?D:     " + *v.MessageId)
-		// fmt.Println("Message Body: " + *v.Body)
+
+	for {
+		messages, err := sqsClient.ReceiveMessages(ctx, exampleQueueName, nil)
+		if err != nil {
+			panic(err)
+		}
+		for _, message := range messages {
+			fmt.Println(message.Body)
+		}
 	}
 }
